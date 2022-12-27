@@ -21,13 +21,14 @@ public abstract sealed class DefaultBaseFuture<T> implements Future<T> permits D
         this.surrendered = surrendered;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T join() {
         if (surrendered.getClass().getTypeName().equals(Runnable.class.getTypeName()))
             throw new UnsupportedOperationException("This operation cannot be performed with a Value which doesn't has a return!");
 
         try {
-            return futureExecutor.join0(this);
+            return futureExecutor.join0((FutureValue<T>) this.surrendered);
         } catch (UnknownAccessException e) {
             throw new RuntimeException(e);
         }
