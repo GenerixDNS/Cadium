@@ -4,6 +4,7 @@ import org.cadium.base.exceptions.UnknownAccessException;
 import org.cadium.base.futures.Future;
 import org.cadium.base.futures.FutureValue;
 import org.cadium.impl.futures.FutureExecutorImpl;
+import org.cadium.impl.security.Security;
 
 public abstract sealed class DefaultBaseFuture<T> implements Future<T> permits DefaultCadiumFuture {
 
@@ -13,7 +14,10 @@ public abstract sealed class DefaultBaseFuture<T> implements Future<T> permits D
     protected boolean done = false;
     protected boolean successful = false;
 
-    public DefaultBaseFuture(FutureValue<T> surrendered) {
+    public DefaultBaseFuture(Object surrendered) throws UnknownAccessException {
+        if (!Security.isCore())
+            throw new UnknownAccessException();
+
         this.surrendered = surrendered;
     }
 
