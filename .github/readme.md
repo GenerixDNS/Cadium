@@ -1,4 +1,8 @@
-# Cadium <img src="/.github/images/Cadium.png" width="120px" alt="icon" align="center">
+<!--suppress CheckImageSize -->
+<div>
+    <h1 align="center">Cadium</h1>
+    <img src="/.github/images/Cadium.png" width="120px" alt="icon" align="center">
+</div>
 
 ---
 
