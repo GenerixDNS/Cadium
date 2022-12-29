@@ -1,5 +1,4 @@
-# Cadium
-<img src="/.github/images/Cadium.png" width="50px" alt="icon">
+# Cadium <img src="/.github/images/Cadium.png" width="120px" alt="icon">
 
 ---
 
