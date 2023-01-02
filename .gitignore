@@ -2,3 +2,6 @@
 /.idea/
 /cadium.iml/
 /core-futures/target/
+/future-transport/cmake-build-debug/
+/future-transport/build/
+/future-transport/.idea/
