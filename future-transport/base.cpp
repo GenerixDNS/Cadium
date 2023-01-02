@@ -20,15 +20,15 @@ public:
 
 };
 
-static std::vector<std::pair<JPointer, std::future<std::any>>> CACHED_FUTURES;
+static std::vector<std::pair<JPointer, std::future<std::any>*>> CACHED_FUTURES;
 
-const std::future<std::any>* GET_BY_UNIQUE(JPointer pointer)
+std::future<std::any>* GET_BY_UNIQUE(JPointer pointer)
 {
     for (const auto &item: CACHED_FUTURES)
     {
         if (item.first == pointer)
         {
-            return &item.second;
+            return item.second;
         }
     }
     throw FutureNotFoundException("A Future with this id couldn't be found!");
@@ -73,11 +73,12 @@ JNIEXPORT void JNICALL Java_org_cadium_future_FutureStandardExecutor_async
         (JNIEnv* environment, jclass, jint unique_id, jobject handler)
 {
     auto pointer = cast(unique_id);
-    std::future<std::any> future = std::async([]()
+    auto method_id = environment->GetMethodID(environment->GetObjectClass(handler), "on", "()Ljava/lang/Object;");
+    std::future<std::any> future = std::async([&environment, &handler, &method_id]()
             {
-                return std::any();
+                return std::any(environment->CallObjectMethod(handler, method_id));
             });
-    CACHED_FUTURES.push_back(std::pair{ pointer, future });
+    CACHED_FUTURES.emplace_back( pointer, &future );
 }
 
 /*
@@ -86,9 +87,11 @@ JNIEXPORT void JNICALL Java_org_cadium_future_FutureStandardExecutor_async
  * Signature: (I)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL Java_org_cadium_future_FutureStandardExecutor_collect
-        (JNIEnv *, jclass, jint)
+        (JNIEnv *, jclass, jint unique_id)
 {
-
+    auto pointer = cast(unique_id);
+    std::future<std::any>* result = GET_BY_UNIQUE(pointer);
+    return std::any_cast<jobject>(result->get());
 }
 
 /*
@@ -97,9 +100,10 @@ JNIEXPORT jobject JNICALL Java_org_cadium_future_FutureStandardExecutor_collect
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_org_cadium_future_FutureStandardExecutor_flush
-        (JNIEnv *, jclass, jint)
+        (JNIEnv *, jclass, jint unique_id)
 {
-
+    auto pointer = cast(unique_id);
+    FLUSH_BY_UNIQUE_ID(pointer);
 }
 
 /*
@@ -108,7 +112,9 @@ JNIEXPORT void JNICALL Java_org_cadium_future_FutureStandardExecutor_flush
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_org_cadium_future_FutureStandardExecutor_wait
-        (JNIEnv *, jclass, jint)
+        (JNIEnv *, jclass, jint unique_id)
 {
-
+    auto pointer = cast(unique_id);
+    std::future<std::any>* result = GET_BY_UNIQUE(pointer);
+    result->wait();
 }

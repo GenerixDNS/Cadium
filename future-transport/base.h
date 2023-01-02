@@ -16,7 +16,7 @@
 typedef unsigned int JPointer;
 
 /* returns future of the java unique_id */
-const std::future<std::any> * GET_BY_UNIQUE(JPointer pointer);
+std::future<std::any> * GET_BY_UNIQUE(JPointer pointer);
 
 bool FLUSH_BY_UNIQUE_ID(JPointer pointer);
 
